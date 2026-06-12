@@ -1,0 +1,14 @@
+* text=auto eol=lf
+
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+
+/.github export-ignore
+/tests export-ignore
+/phpunit.xml export-ignore
+/composer.local.json.example export-ignore
+/docs export-ignore
+/demo export-ignore

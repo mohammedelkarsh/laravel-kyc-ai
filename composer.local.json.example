@@ -1,0 +1,40 @@
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../validators/packages/core",
+            "options": {
+                "versions": {
+                    "validators/core": "1.0.2"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../validators/packages/sa",
+            "options": {
+                "versions": {
+                    "validators/sa": "1.0.2"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../validators/packages/ae",
+            "options": {
+                "versions": {
+                    "validators/ae": "1.0.2"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "../validators/packages/eg",
+            "options": {
+                "versions": {
+                    "validators/eg": "1.0.2"
+                }
+            }
+        }
+    ]
+}
