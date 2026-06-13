@@ -33,11 +33,7 @@ return [
         'default' => env('KYC_EXTERNAL_DRIVER'),
 
         'drivers' => [
-            'shufti' => [
-                'client_id' => env('SHUFTI_CLIENT_ID'),
-                'secret' => env('SHUFTI_SECRET'),
-                'base_url' => env('SHUFTI_BASE_URL', 'https://api.shuftipro.com'),
-            ],
+            // Register drivers from satellite packages, e.g. kyc-ai/external-shufti.
         ],
     ],
 

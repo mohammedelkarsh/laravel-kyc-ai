@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use KycAi\Laravel\Kyc;
 use KycAi\Laravel\KycServiceProvider;
+use KycAi\Laravel\Support\ExternalDriverRegistry;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -36,6 +37,7 @@ abstract class TestCase extends Orchestra
     protected function tearDown(): void
     {
         Kyc::resetFakeState();
+        ExternalDriverRegistry::flush();
 
         parent::tearDown();
     }

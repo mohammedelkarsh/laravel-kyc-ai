@@ -10,7 +10,7 @@ use KycAi\Laravel\Drivers\FakeExtractionDriver;
 use KycAi\Laravel\Drivers\OpenAiVisionDriver;
 use KycAi\Laravel\Drivers\TesseractExtractionDriver;
 use KycAi\Laravel\Exceptions\KycException;
-use KycAi\Laravel\External\ShuftiExternalVerifier;
+use KycAi\Laravel\Support\ExternalDriverRegistry;
 use KycAi\Laravel\Verifiers\NullExternalVerifier;
 
 final class KycManager
@@ -57,8 +57,7 @@ final class KycManager
 
         return match ($name) {
             'null', 'none' => new NullExternalVerifier,
-            'shufti' => new ShuftiExternalVerifier($drivers['shufti'] ?? []),
-            default => throw KycException::unknownExternalDriver((string) $name),
+            default => ExternalDriverRegistry::resolve((string) $name, $drivers[$name] ?? []),
         };
     }
 

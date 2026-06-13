@@ -1,5 +1,6 @@
 {
     "name": "kyc-ai/laravel",
+    "version": "1.1.0",
     "description": "Laravel KYC: extract identity documents with AI and verify with country-specific validators.",
     "type": "library",
     "license": "MIT",
@@ -40,6 +41,7 @@
         "validators/eg": "^1.0"
     },
     "suggest": {
+        "kyc-ai/external-shufti": "Shufti Pro external identity verification driver",
         "validators/ae": "UAE Emirates ID internal verification",
         "validators/eg": "Egyptian national ID internal verification",
         "filament/filament": "Admin UI for manual KYC review (^3.0)",

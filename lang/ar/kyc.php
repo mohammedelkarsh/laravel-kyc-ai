@@ -9,6 +9,8 @@ return [
     'match.mismatch' => 'رقم الهوية المستخرج لا يطابق القيمة المدخلة.',
     'internal.invalid' => 'رقم الهوية لم يجتز التحقق الداخلي.',
     'external.not_configured' => 'التحقق الخارجي غير مُعدّ.',
+    'external.document_required' => 'الوثيقة مطلوبة للتحقق الخارجي.',
     'external.provider_error' => 'مزود التحقق الخارجي أعاد خطأ.',
     'external.rejected' => 'تم رفض التحقق الخارجي.',
+    'external.timeout' => 'انتهت مهلة التحقق الخارجي قبل ظهور نتيجة نهائية.',
 ];

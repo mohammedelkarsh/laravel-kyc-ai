@@ -13,7 +13,7 @@ Extraction driver (optional)     fake | openai | tesseract
         ↓
 Internal verifier (default)        validators/sa | ae | eg
         ↓
-External verifier (opt-in)         shufti (+ yakeen future package)
+External verifier (opt-in)         register via ExternalDriverRegistry (e.g. kyc-ai/external-shufti)
         ↓
 Audit log (optional) + Events
         ↓
@@ -36,7 +36,8 @@ KycResult
 | UAE internal verifier | Done (`validators/ae` optional) |
 | Egypt internal verifier | Done (`validators/eg` optional) |
 | Fake / OpenAI / Tesseract extraction | Done |
-| Shufti external stub | Done |
+| External driver registry | Done (v1.1) |
+| Shufti driver package | `kyc-ai/external-shufti` |
 | Queue job `ProcessKycDocument` | Done |
 | Events `KycVerified` / `KycFailed` | Done |
 | Audit model + migration | Done |

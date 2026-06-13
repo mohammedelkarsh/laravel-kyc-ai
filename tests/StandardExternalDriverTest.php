@@ -4,25 +4,34 @@ declare(strict_types=1);
 
 namespace KycAi\Laravel\Tests;
 
-use Illuminate\Support\Facades\Http;
 use KycAi\Laravel\Exceptions\KycException;
 use KycAi\Laravel\KycLevel;
-use KycAi\Laravel\KycManager;
+use KycAi\Laravel\Support\ExternalDriverRegistry;
+use KycAi\Laravel\Tests\Support\AcceptingExternalVerifier;
+use KycAi\Laravel\Tests\Support\RejectingExternalVerifier;
 
 final class StandardExternalDriverTest extends TestCase
 {
-    public function test_standard_level_with_verify_with_shufti_when_enabled(): void
+    protected function setUp(): void
     {
-        Http::fake([
-            'https://api.shuftipro.com/status' => Http::response(['event' => 'verification.accepted']),
-        ]);
+        parent::setUp();
 
+        ExternalDriverRegistry::flush();
+        ExternalDriverRegistry::register('test-accept', fn (): AcceptingExternalVerifier => new AcceptingExternalVerifier);
+        ExternalDriverRegistry::register('test-reject', fn (): RejectingExternalVerifier => new RejectingExternalVerifier);
+    }
+
+    protected function tearDown(): void
+    {
+        ExternalDriverRegistry::flush();
+
+        parent::tearDown();
+    }
+
+    public function test_standard_level_with_verify_with_external_when_enabled(): void
+    {
         config([
             'kyc.external_verification.enabled' => true,
-            'kyc.external_verification.drivers.shufti' => [
-                'client_id' => 'id',
-                'secret' => 'secret',
-            ],
         ]);
 
         $this->refreshKycContainer();
@@ -32,7 +41,7 @@ final class StandardExternalDriverTest extends TestCase
         $result = $this->kyc()->document($this->tempFile('1001244084.jpg'))
             ->country('sa')
             ->level(KycLevel::Standard)
-            ->verifyWith('shufti')
+            ->verifyWith('test-accept')
             ->verify();
 
         $this->assertTrue($result->passed());
@@ -50,19 +59,11 @@ final class StandardExternalDriverTest extends TestCase
             ->verify();
     }
 
-    public function test_shufti_rejected_event_fails_verification(): void
+    public function test_external_rejected_event_fails_verification(): void
     {
-        Http::fake([
-            'https://api.shuftipro.com/status' => Http::response(['event' => 'verification.declined']),
-        ]);
-
         config([
             'kyc.external_verification.enabled' => true,
-            'kyc.external_verification.default' => 'shufti',
-            'kyc.external_verification.drivers.shufti' => [
-                'client_id' => 'id',
-                'secret' => 'secret',
-            ],
+            'kyc.external_verification.default' => 'test-reject',
         ]);
 
         $this->refreshKycContainer();
@@ -80,7 +81,7 @@ final class StandardExternalDriverTest extends TestCase
 
     private function refreshKycContainer(): void
     {
-        $this->app->forgetInstance(KycManager::class);
+        $this->app->forgetInstance(\KycAi\Laravel\KycManager::class);
         $this->app->forgetInstance(\KycAi\Laravel\KycVerifier::class);
         $this->app->forgetInstance(\KycAi\Laravel\Kyc::class);
     }

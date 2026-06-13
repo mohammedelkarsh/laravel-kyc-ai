@@ -5,7 +5,7 @@
 
 Laravel package for **KYC workflows**: extract identity fields from documents (AI/OCR), verify with country-specific [validators](https://packagist.org/packages/validators/sa) packages, and optionally call external providers.
 
-> **v1.0** · SA / AE / EG · fake · OpenAI · Tesseract · Queue · API · Demo UI · Filament review
+> **v1.1** · SA / AE / EG · fake · OpenAI · Tesseract · external drivers · Queue · API · Demo UI · Filament review
 
 ---
 
@@ -87,9 +87,9 @@ use KycAi\Laravel\Rules\KycDocument;
 | `tesseract` | No |
 | `openai` | Yes |
 
-| External | Sends data outside? |
-|----------|---------------------|
-| `shufti` | Yes (requires API keys) |
+| External | Sends data outside? | Package |
+|----------|---------------------|---------|
+| `shufti` | Yes (requires API keys) | [`kyc-ai/external-shufti`](https://packagist.org/packages/kyc-ai/external-shufti) |
 
 ```env
 KYC_EXTRACTION_DRIVER=fake
@@ -97,6 +97,13 @@ OPENAI_API_KEY=
 TESSERACT_BINARY=tesseract
 KYC_EXTERNAL_ENABLED=false
 KYC_EXTERNAL_DRIVER=shufti
+```
+
+Install Shufti driver:
+
+```bash
+composer require kyc-ai/external-shufti
+php artisan vendor:publish --tag=kyc-shufti-config
 ```
 
 ---

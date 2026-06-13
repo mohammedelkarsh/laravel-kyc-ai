@@ -77,6 +77,7 @@ final class KycVerifier
                 country: $state['country'],
                 nationalId: $internal->nationalId(),
                 context: $extraction?->fields() ?? [],
+                document: $document,
             ));
 
             if ($verifier->sendsDataExternally()) {

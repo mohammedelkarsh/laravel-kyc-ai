@@ -13,7 +13,7 @@ composer test:comprehensive   # human-readable testdox output
 | Levels | `KycLevelTest` |
 | Internal verify (SA/AE/EG) | `InternalVerificationScenariosTest` |
 | Extraction drivers | `ExtractionDriversTest` |
-| External (Shufti) | `ExternalVerificationTest`, `StandardExternalDriverTest` |
+| External (registry) | `ExternalDriverRegistryTest`, `ExternalVerificationTest`, `StandardExternalDriverTest` |
 | Confidence & privacy | `ConfidenceAndWarningsTest` |
 | Events | `KycEventsTest` |
 | Audit DB | `KycAuditTest` |

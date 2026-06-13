@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace KycAi\Laravel\Data;
 
+use KycAi\Laravel\Support\DocumentSource;
+
 final class ExternalVerificationRequest
 {
     /**
@@ -13,6 +15,7 @@ final class ExternalVerificationRequest
         private readonly string $country,
         private readonly string $nationalId,
         private readonly array $context = [],
+        private readonly ?DocumentSource $document = null,
     ) {}
 
     public function country(): string
@@ -31,5 +34,10 @@ final class ExternalVerificationRequest
     public function context(): array
     {
         return $this->context;
+    }
+
+    public function document(): ?DocumentSource
+    {
+        return $this->document;
     }
 }

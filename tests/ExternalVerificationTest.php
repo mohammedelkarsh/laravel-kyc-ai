@@ -4,64 +4,34 @@ declare(strict_types=1);
 
 namespace KycAi\Laravel\Tests;
 
-use Illuminate\Support\Facades\Http;
-use KycAi\Laravel\External\ShuftiExternalVerifier;
 use KycAi\Laravel\KycLevel;
-use KycAi\Laravel\KycManager;
+use KycAi\Laravel\Support\ExternalDriverRegistry;
+use KycAi\Laravel\Tests\Support\AcceptingExternalVerifier;
+use KycAi\Laravel\Tests\Support\NotConfiguredExternalVerifier;
 
 final class ExternalVerificationTest extends TestCase
 {
-    public function test_shufti_returns_not_configured_without_credentials(): void
+    protected function setUp(): void
     {
-        $verifier = new ShuftiExternalVerifier([]);
+        parent::setUp();
 
-        $result = $verifier->verify(new \KycAi\Laravel\Data\ExternalVerificationRequest('sa', '1001244084'));
-
-        $this->assertFalse($result->passed());
-        $this->assertSame('shufti', $result->provider());
-        $this->assertSame('kyc.external.not_configured', $result->failureReason());
-        $this->assertTrue($verifier->sendsDataExternally());
+        ExternalDriverRegistry::flush();
+        ExternalDriverRegistry::register('test-accept', fn (): AcceptingExternalVerifier => new AcceptingExternalVerifier);
+        ExternalDriverRegistry::register('test-not-configured', fn (): NotConfiguredExternalVerifier => new NotConfiguredExternalVerifier);
     }
 
-    public function test_shufti_accepts_verification_response(): void
+    protected function tearDown(): void
     {
-        Http::fake([
-            'https://api.shuftipro.com/status' => Http::response(['event' => 'verification.accepted']),
-        ]);
+        ExternalDriverRegistry::flush();
 
-        $verifier = new ShuftiExternalVerifier([
-            'client_id' => 'id',
-            'secret' => 'secret',
-        ]);
-
-        $result = $verifier->verify(new \KycAi\Laravel\Data\ExternalVerificationRequest('sa', '1001244084'));
-
-        $this->assertTrue($result->passed());
+        parent::tearDown();
     }
 
-    public function test_shufti_handles_provider_error(): void
-    {
-        Http::fake([
-            'https://api.shuftipro.com/status' => Http::response(['error' => 'bad'], 500),
-        ]);
-
-        $verifier = new ShuftiExternalVerifier([
-            'client_id' => 'id',
-            'secret' => 'secret',
-        ]);
-
-        $result = $verifier->verify(new \KycAi\Laravel\Data\ExternalVerificationRequest('sa', '1001244084'));
-
-        $this->assertFalse($result->passed());
-        $this->assertSame('kyc.external.provider_error', $result->failureReason());
-    }
-
-    public function test_full_level_with_shufti_not_configured_fails(): void
+    public function test_full_level_with_external_not_configured_fails(): void
     {
         config([
             'kyc.external_verification.enabled' => true,
-            'kyc.external_verification.default' => 'shufti',
-            'kyc.external_verification.drivers.shufti' => [],
+            'kyc.external_verification.default' => 'test-not-configured',
         ]);
 
         $this->refreshKycContainer();
@@ -78,19 +48,11 @@ final class ExternalVerificationTest extends TestCase
         $this->assertContains('data_sent_for_external_verification', $result->warnings());
     }
 
-    public function test_full_level_with_shufti_accepted_passes(): void
+    public function test_full_level_with_external_accepted_passes(): void
     {
-        Http::fake([
-            'https://api.shuftipro.com/status' => Http::response(['event' => 'verification.accepted']),
-        ]);
-
         config([
             'kyc.external_verification.enabled' => true,
-            'kyc.external_verification.default' => 'shufti',
-            'kyc.external_verification.drivers.shufti' => [
-                'client_id' => 'id',
-                'secret' => 'secret',
-            ],
+            'kyc.external_verification.default' => 'test-accept',
         ]);
 
         $this->refreshKycContainer();
@@ -106,20 +68,20 @@ final class ExternalVerificationTest extends TestCase
         $this->assertTrue($result->external()?->passed());
     }
 
-    private function refreshKycContainer(): void
-    {
-        $this->app->forgetInstance(KycManager::class);
-        $this->app->forgetInstance(\KycAi\Laravel\KycVerifier::class);
-        $this->app->forgetInstance(\KycAi\Laravel\Kyc::class);
-    }
-
     public function test_verify_with_external_when_disabled_throws(): void
     {
         $this->expectException(\KycAi\Laravel\Exceptions\KycException::class);
 
         $this->kyc()->number('1001244084')
             ->country('sa')
-            ->verifyWith('shufti')
+            ->verifyWith('test-accept')
             ->verify();
+    }
+
+    private function refreshKycContainer(): void
+    {
+        $this->app->forgetInstance(\KycAi\Laravel\KycManager::class);
+        $this->app->forgetInstance(\KycAi\Laravel\KycVerifier::class);
+        $this->app->forgetInstance(\KycAi\Laravel\Kyc::class);
     }
 }
